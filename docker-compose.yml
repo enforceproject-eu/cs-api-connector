@@ -1,0 +1,40 @@
+services:
+  cs-api-connector:
+    image: pross/demo-case-study:latest
+    build: .
+    restart: unless-stopped
+    ports:
+      - '8080:8080'
+    depends_on:
+      - postgres
+    environment:
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_PORT: ${DB_PORT}
+      DB_HOST: ${DB_HOST}
+      MINKA_URL_SPEC: ${MINKAURL_SPEC}
+      EXECUTION_PERIOD: ${EXECUTION_PERIOD}
+    networks:
+      - demo-case-study
+
+  postgres:
+    image: postgis/postgis:17-3.5-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER:  ${DB_USERNAME}
+      POSTGRES_PASSWORD:  ${DB_PASSWORD}
+    ports:
+     - '5432:5432'
+    volumes:
+     - cs-api-connector-postgres-storage:/var/lib/postgresql/data
+    networks:
+      - cs-api-connector
+
+networks:
+  cs-api-connector:
+volumes:
+    cs-api-connector-postgres-storage:
+      external: true
+      name: cs-api-connector-postgres-storage
