@@ -1,0 +1,56 @@
+name: Build and Push Docker Image
+on: 
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request: 
+    branches: [ main ]
+    
+env:
+  BUILD_CONTEXT: ./
+  IMAGE_AUTHORS: https://52North.org/
+  IMAGE_DESCRIPTION: 52°North ENFORCE, API Connector
+  IMAGE_LICENSES: MIT
+  IMAGE_TAG: 52north/enforce_api-connector
+  IMAGE_TITLE: 52°North ENFORCE API Connector
+  IMAGE_VENDOR: 52°North GmbH
+
+jobs: 
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3 
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with: 
+         java-version: '17'
+         distribution: 'temurin'
+         cache: maven 
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml 
+      - name: Extract metadata (tags, labels) for tagging Docker Image
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: "${{ env.IMAGE_TAG }}"
+          labels: |
+            "org.opencontainers.image.authors=${{ env.IMAGE_AUTHORS }}"
+            "org.opencontainers.image.vendor=${{ env.IMAGE_VENDOR }}"
+            "org.opencontainers.image.description=${{ env.IMAGE_DESCRIPTION }}"
+            "org.opencontainers.image.title=${{ env.IMAGE_TITLE }}"
+            "org.opencontainers.image.licenses=${{ env.IMAGE_LICENSES }}"
+          tags: |
+            type=ref,event=branch
+            type=ref,event=tag
+      - name: Login to Docker Hub
+        if: github.event_name != 'pull_request' 
+        uses: docker/login-action@v3
+        with: 
+          username: ${{ secrets.DOCKERHUB_USERNAME }} 
+          password: ${{ secrets.DOCKERHUB_TOKEN }} 
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6 
+        with:
+          context: ${{ env.BUILD_CONTEXT }}
+          push: ${{ github.event_name != 'pull_request' }} 
+          tags: ${{ steps.meta.outputs.tags }}
