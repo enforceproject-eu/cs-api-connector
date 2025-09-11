@@ -3,8 +3,12 @@ package org.n52.project.enforce.fetching;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -32,21 +36,33 @@ public class MinkaApiFetcher {
 
 	private URL outputDataUrl;
 
+	private URL updateUrl;
+
 	private ObjectMapper mapper;
 
 	private String urlSpec;
 
 	private Utils utils;
 
+	private boolean initialize = false;
+
+	private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("YYYY-MM-dd");
+
 	private static Logger LOG = LoggerFactory.getLogger(MinkaApiFetcher.class);
 
-	public MinkaApiFetcher(DataRepository dataRepository, Utils utils, 
-			Environment environment) {
+	public MinkaApiFetcher(DataRepository dataRepository, Utils utils, Environment environment) {
 
 		this.mapper = new ObjectMapper();
 		mapper.registerModule(new JavaTimeModule());
 		this.utils = utils;
 		urlSpec = environment.getProperty("minka.url.spec");
+		initialize = Boolean.parseBoolean(environment.getProperty("minka.db.initialize"));
+		try {
+			updateUrl = new URI(String.format(environment.getProperty("minka.update.url.spec"),
+					dateTimeFormatter.format(OffsetDateTime.now()))).toURL();
+		} catch (URISyntaxException | MalformedURLException e) {
+			LOG.error(e.getMessage());
+		}
 
 		try {
 			outputDataUrl = findEndpoint();
@@ -54,7 +70,27 @@ public class MinkaApiFetcher {
 			LOG.error(e.getMessage());
 			throw new RuntimeException(e);
 		}
-		ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
+
+		if (initialize) {
+			//fetch 1000 observations
+			if (LOG.isInfoEnabled()) {
+				LOG.info("Initialize database.");
+			}
+			for (int i = 1; i < 21; i++) {
+				String initialUrlSpecString = String.format(environment.getProperty("minka.initialize.url.spec"), i);
+				if (LOG.isInfoEnabled()) {
+					LOG.info(String.format("Fetching data from: %s.", initialUrlSpecString));
+				}
+				try {
+					fetchAndStoreData(new URI(initialUrlSpecString).toURL());
+					Thread.sleep(10000);
+				} catch (Exception e) {
+					LOG.error(e.getMessage());
+				}
+			}
+		}
+
+		ScheduledExecutorService ses = Executors.newScheduledThreadPool(2);
 		Runnable runnableTask = () -> {
 			try {
 				fetchAndStoreData();
@@ -70,23 +106,59 @@ public class MinkaApiFetcher {
 					initialDelay, period));
 		}
 		ses.scheduleAtFixedRate(runnableTask, initialDelay, period, TimeUnit.SECONDS);
+
+		Runnable updateRunnableTask = () -> {
+			try {
+				checkForUpdates();
+			} catch (Exception e) {
+				LOG.error(e.getMessage());
+			}
+		};
+
+		if (LOG.isInfoEnabled()) {
+			LOG.info(String.format("Starting update task with initialDelay: %d and period: 1 day.", initialDelay));
+		}
+		ses.scheduleAtFixedRate(updateRunnableTask, 1, 5, TimeUnit.HOURS);
 	}
 
-	private void fetchAndStoreData() throws Exception {		
-		JsonNode node = mapper.readTree(outputDataUrl);		
-		LOG.info("Fetched output.");		
-		if(node instanceof ObjectNode) {
-			ObjectNode objectNode = (ObjectNode)node;
+	private void checkForUpdates() throws Exception {
+		JsonNode node = mapper.readTree(updateUrl);
+		LOG.info("Fetched output.");
+		if (node instanceof ObjectNode) {
+			ObjectNode objectNode = (ObjectNode) node;
 			JsonNode results = objectNode.path("results");
-			if(results instanceof ArrayNode) {
-				ArrayNode resultsArray = (ArrayNode)results;
+			if (results instanceof ArrayNode) {
+				ArrayNode resultsArray = (ArrayNode) results;
 				for (JsonNode jsonNode : resultsArray) {
 					UUID id = utils.getId(jsonNode);
-					if(utils.ckeckIdIsInDb(id)) {
+					if (utils.ckeckIdIsInDb(id)) {
+						utils.updateData(jsonNode);
+					}
+				}
+			}
+		}
+
+	}
+
+	private void fetchAndStoreData() throws Exception {
+		fetchAndStoreData(outputDataUrl);
+	}
+	
+	private void fetchAndStoreData(URL url) throws Exception {
+		JsonNode node = mapper.readTree(url);
+		LOG.info("Fetched output.");
+		if (node instanceof ObjectNode) {
+			ObjectNode objectNode = (ObjectNode) node;
+			JsonNode results = objectNode.path("results");
+			if (results instanceof ArrayNode) {
+				ArrayNode resultsArray = (ArrayNode) results;
+				for (JsonNode jsonNode : resultsArray) {
+					UUID id = utils.getId(jsonNode);
+					if (utils.ckeckIdIsInDb(id)) {
 						LOG.info(String.format("Data was with id %s already in database.", id.toString()));
 						continue;
 					}
-				    utils.createNewData(jsonNode);
+					utils.createNewData(jsonNode);
 					LOG.info("New Data was created.");
 				}
 			}
@@ -109,7 +181,8 @@ public class MinkaApiFetcher {
 		} catch (Exception e) {
 			LOG.info("Endpoint not available.", e);
 		}
-		if (urlConnection instanceof HttpURLConnection && ((HttpURLConnection) urlConnection).getResponseCode() == 200) {
+		if (urlConnection instanceof HttpURLConnection
+				&& ((HttpURLConnection) urlConnection).getResponseCode() == 200) {
 			LOG.info("Found endpoint at: " + urlSpec);
 		}
 		return outputDataUrl;

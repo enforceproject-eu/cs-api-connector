@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS public.data
 (
     id uuid NOT NULL,
-    location geometry,
+    location geometry(Point,4326),
     user_id smallint,
     species_name character varying(255),
     observed_datetime timestamp with time zone,

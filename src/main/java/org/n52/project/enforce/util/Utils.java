@@ -43,6 +43,7 @@ public class Utils {
 		JsonNode time = jsonNode.path("time_observed_at");
 		JsonNode locationNode = jsonNode.path("location");
 		JsonNode speciesGuess = jsonNode.path("species_guess");
+		JsonNode updatedAt = jsonNode.path("updated_at");
 		JsonNode userId = jsonNode.path("user").path("id");
 		ArrayNode identifications = (ArrayNode) jsonNode.path("identifications");
 		JsonNode photoUrl = identifications.get(0).path("taxon").path("default_photo").path("url");	    
@@ -60,12 +61,29 @@ public class Utils {
 		dbData.setLocation(location);
 		dbData.setSpeciesName(speciesGuess.asText());
 		dbData.setObservedDatetime(OffsetDateTime.parse(time.asText()));
+		dbData.setUpdatedDatetime(OffsetDateTime.parse(updatedAt.asText()));
 		dataRepository.saveAndFlush(dbData);
 	}
 	
 	public UUID getId(JsonNode node) {
 		JsonNode uuid = node.path("uuid");
 		return UUID.fromString(uuid.asText());
+	}
+
+	public void updateData(JsonNode jsonNode) {
+		JsonNode updatedAt = jsonNode.path("updated_at");
+		OffsetDateTime newUpdatedAt = OffsetDateTime.parse(updatedAt.asText());
+		UUID id = getId(jsonNode);
+		Optional<Data> dbDataOpt = dataRepository.findById(id);
+		if (dbDataOpt.isPresent()) {
+			Data dbData = dbDataOpt.get();
+			OffsetDateTime dbUpdatedAt = dbData.getUpdatedDatetime();
+			if(newUpdatedAt.isAfter(dbUpdatedAt)) {
+			    dbData.setUpdatedDatetime(newUpdatedAt);
+			    dataRepository.save(dbData);
+				LOG.info(String.format("Data was with id %s was updated.", id.toString()));
+			}
+		}
 	}
 
 }
