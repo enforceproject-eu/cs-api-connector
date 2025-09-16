@@ -36,7 +36,7 @@
 
         const MAX_FEATURE_COUNT = 1000;
         const MAP_CRS = 'EPSG:4326';
-        const GEOSERVER_URL = 'http://localhost:8080/data';
+        const GEOSERVER_URL = '/data';
         
         class Map {
 
@@ -95,11 +95,7 @@
 
                 if (!!this.featureLayer) {
                     this.map.removeLayer(this.featureLayer);
-                }
-				
-	            // create popup contents
-                //var customPopup = "Mozilla Toronto Offices<br/><img src='http://joshuafrazier.info/images/maptime.gif' alt='maptime logo gif' width='350px'/>";
-                
+                }      
                 
                 // specify popup options 
                 var customOptions =
@@ -109,7 +105,9 @@
                     'className' : 'custom'
                 }
                 
-                var today = Date.parse("2025-08-26");
+                //var today = Date.parse("2025-08-26");
+                //var today = new Date().toJSON().slice(0, 10);
+                var today = Date.now();
                 
                 function determineColor(date) {
                 	  if ( date < today) {
