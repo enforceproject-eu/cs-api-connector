@@ -80,14 +80,8 @@
             async fetchFeatures() {
 
                 const params = new URLSearchParams({
-                    service: 'WFS',
-                    version: '2.0.0',
-                    request: 'GetFeature',
-                    typeName: '	enforce_cs4:data',
-                    srsName: MAP_CRS,
-                    count: `${MAX_FEATURE_COUNT}`,  // note: maxFeatures with WFS 1.1 and earlier
+                    limit: `${MAX_FEATURE_COUNT}`,  // note: maxFeatures with WFS 1.1 and earlier
                     outputFormat: 'application/json',
-                    bbox: `${this.map.getBounds().toBBoxString()},${MAP_CRS}`,
                 });
 
                 const response = await fetch(`${GEOSERVER_URL}?${params}`);
@@ -105,8 +99,6 @@
                     'className' : 'custom'
                 }
                 
-                //var today = Date.parse("2025-08-26");
-                //var today = new Date().toJSON().slice(0, 10);
                 var today = Date.now();
                 
                 function determineColor(date) {

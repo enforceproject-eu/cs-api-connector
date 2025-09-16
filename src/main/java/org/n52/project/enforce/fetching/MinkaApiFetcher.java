@@ -155,7 +155,7 @@ public class MinkaApiFetcher {
 				for (JsonNode jsonNode : resultsArray) {
 					UUID id = utils.getId(jsonNode);
 					if (utils.ckeckIdIsInDb(id)) {
-						LOG.info(String.format("Data was with id %s already in database.", id.toString()));
+						LOG.info(String.format("Data with id %s already exists in database.", id.toString()));
 						continue;
 					}
 					utils.createNewData(jsonNode);
