@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS4 Playas Data</title>
+
+    <script src="https://unpkg.com/rxjs@^7/dist/bundles/rxjs.umd.min.js"></script>
+
+    <link href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" rel="stylesheet"/>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+    <style>
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+		.leaflet-container {
+			height: 1000px;
+			width: 1000px;
+			max-width: 100%;
+			max-height: 100%;
+		}
+		.leaflet-popup-content {
+			height: 300px;
+			width: 300px !important;
+		}
+		img.half {
+            height: 50%;
+            width: 50%;
+        }
+    </style>
+
+    <script>
+
+        const MAX_FEATURE_COUNT = 1000;
+        const MAP_CRS = 'EPSG:4326';
+        const GEOSERVER_URL = '/cs4_playas_data';
+        
+        class Map {
+
+            map;
+            featureLayer;
+
+            constructor() {
+                this.initMap();
+            }
+
+            initMap() {
+
+                this.map = L.map('map', {
+                    center: [41.3697481733, 2.1907388249],
+                    zoom: 11,
+                });
+
+                const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(this.map);
+
+                tiles.addTo(this.map);
+
+                this.fetchFeatures();
+
+                const subject = new rxjs.Subject();
+                subject.asObservable()
+                    .pipe(
+                        rxjs.sampleTime(250)
+                    )
+                    .subscribe(_ => this.fetchFeatures());
+
+                for (const eventName of ['resize', 'viewreset', 'zoomend', 'moveend']) {
+                    this.map.on(eventName, event => {
+                        subject.next(event);
+                    });
+                }
+
+            }
+
+            async fetchFeatures() {
+
+                const params = new URLSearchParams({
+                    limit: `${MAX_FEATURE_COUNT}`,  // note: maxFeatures with WFS 1.1 and earlier
+                    outputFormat: 'application/json',
+                });
+
+                const response = await fetch(`${GEOSERVER_URL}?${params}`);
+                const features = await response.json();
+
+                if (!!this.featureLayer) {
+                    this.map.removeLayer(this.featureLayer);
+                }      
+                
+                // specify popup options 
+                var customOptions =
+                    {
+                    'width': '500',
+                    'heigth': '500',
+                    'className' : 'custom'
+                }
+                
+                var today = Date.now();
+                
+                function determineColor(date) {
+                	  if ( date < today) {
+                	    return 'red';
+                	  } else if ( date >= today) {
+                	    return 'blue';
+                	  }
+                }
+                
+                this.featureLayer = L.geoJSON(features, {
+                    pointToLayer: (feature, latlng) => L.circleMarker(latlng, {
+                        radius: 3,
+                        color: determineColor(Date.parse(feature.properties.updated_datetime)),
+                        fillColor: determineColor(Date.parse(feature.properties.updated_datetime)),
+                        fillOpacity: 1,
+                    }),
+                    onEachFeature: (feature, layer) => {
+                        var customPopup = "<h1>" + feature.properties.total_items + "</h1>" + "</br>" 
+                        +  "<h2>" + feature.properties.cleaning_date + "</h2>";
+					    layer.bindPopup(customPopup);
+                    },
+                }).addTo(this.map);
+
+            }
+
+        }
+
+        document.addEventListener("DOMContentLoaded", () => new Map());
+
+    </script>
+
+</head>
+<body>
+    <h1>ENFORCE CS4</h1>
+    <div id="map"></div>
+</body>
+</html>

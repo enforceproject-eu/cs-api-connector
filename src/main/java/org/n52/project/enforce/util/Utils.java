@@ -146,14 +146,10 @@ public class Utils {
                 cs4PlayasobservedPropertyRepository.saveAndFlush(observedProperty);
             }
         }
-//        CS4PlayasObservedPropertyCountPK observedPropertyCountPk = null;
-//        CS4PlayasObservedPropertyCount observedPropertyCount = null;
         CS4PlayasData data = null;
         Row row = null;
         Cell cell = null;
-        long startTime = 0;
         for (int j = 2; j < columnCount; j++) {
-            startTime = System.currentTimeMillis();
             data = new CS4PlayasData();
             for (int k = 0; k < 15; k++) {
                 row = sheet.getRow(k);
@@ -172,8 +168,7 @@ public class Utils {
                     try {
                         data.setCleaningDate(dateFormat.parse(cell.getStringCellValue()));
                     } catch (ParseException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                        LOG.error(e.getMessage());
                     }
                     break;
                 case 4:
@@ -222,18 +217,12 @@ public class Utils {
                 Optional<CS4PlayasObservedProperty> potentialObservedPeoperty =
                         cs4PlayasobservedPropertyRepository.findById(k);
                 data.putObservedPropertyCount(potentialObservedPeoperty.get(), (int)cell.getNumericCellValue());
-//                observedPropertyCountPk = new CS4PlayasObservedPropertyCountPK(data.getId(), k);
-//                observedPropertyCount = new CS4PlayasObservedPropertyCount(observedPropertyCountPk);
-//                observedPropertyCount.setCount((int) cell.getNumericCellValue());
-//                cs4PlayasObservedPropertyCountRepository.saveAndFlush(observedPropertyCount);
-//                data.addObservedPropertyCount(observedPropertyCount);
             }
             row = sheet.getRow(91);
             cell = row.getCell(j);
             data.setRemarks(cell.getStringCellValue());
             cs4PlayasDataRepository.saveAndFlush(data);
             LOG.info(String.format("Data with id %d added to cs4 data.", data.getId()));
-            LOG.info(String.format("Took %d ms.", System.currentTimeMillis() - startTime));
         }
         workbook.close();
     }
@@ -242,8 +231,8 @@ public class Utils {
         if (pointAsString != null) {
             String[] coordinateArray = pointAsString.split(",");
             if (coordinateArray.length == 2) {
-                String latStrg = coordinateArray[0];
-                String lngStrg = coordinateArray[1];
+                String latStrg = coordinateArray[1];
+                String lngStrg = coordinateArray[0];
                 if ((latStrg != null && !latStrg.isEmpty()) && (lngStrg != null && !lngStrg.isEmpty())) {
                     double lat = Double.parseDouble(latStrg);
                     double lng = Double.parseDouble(lngStrg);
