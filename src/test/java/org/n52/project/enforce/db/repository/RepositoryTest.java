@@ -1,8 +1,10 @@
 package org.n52.project.enforce.db.repository;
 
 import org.n52.project.enforce.Application;
+import org.n52.project.enforce.util.Utils;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -23,6 +25,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @AutoConfigureTestDatabase(
         replace = AutoConfigureTestDatabase.Replace.NONE)
 @ContextConfiguration(classes = Application.class)
+@ComponentScan(basePackageClasses = Utils.class)
 public abstract class RepositoryTest {
 
     static JdbcDatabaseContainer<?> database = new PostgisContainerProvider().newInstance()

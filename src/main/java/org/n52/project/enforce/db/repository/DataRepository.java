@@ -19,30 +19,18 @@ public interface DataRepository extends JpaRepository<Data, UUID> {
 
     /**
      * <p>
-     * union.
+     * getGeoJson.
      * </p>
-     * https://conterrade.atlassian.net/browse/ADESZUERSG-1967
-     * 
-     * @param id
-     *            a {@link java.util.UUID} object
-     * @param namespaceId
-     *            a {@link java.util.UUID} the namespaceId
-     * @return a {@link org.locationtech.jts.geom.Geometry} object
+     * @return a {@link String} object
      */
     @Query("select st_tabletogeojson()")
     String getGeoJson();
 
     /**
      * <p>
-     * union.
+     * getGeoJsonWithLimit.
      * </p>
-     * https://conterrade.atlassian.net/browse/ADESZUERSG-1967
-     * 
-     * @param id
-     *            a {@link java.util.UUID} object
-     * @param namespaceId
-     *            a {@link java.util.UUID} the namespaceId
-     * @return a {@link org.locationtech.jts.geom.Geometry} object
+     * @return a {@link String} object
      */
     @Query("select st_tabletogeojsonwithlimit(cast(:limit as int))")
     String getGeoJsonWithLimit(@Param("limit") Integer limit);

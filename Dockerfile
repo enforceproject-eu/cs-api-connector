@@ -1,11 +1,18 @@
-FROM amd64/eclipse-temurin:17-jdk-ubi9-minimal
+FROM maven:3.9-eclipse-temurin-17 AS build
 
-LABEL MAINTAINER="b.pross@52north.org"
+WORKDIR /tmp
+RUN git clone https://github.com/enforceproject-eu/cs4-db-model
+WORKDIR /tmp/cs4-db-model
+RUN mvn clean install -DskipTests
 
-USER root
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-VOLUME /tmp
-COPY ../../../target/*.jar /usr/local/lib/app.jar
+FROM eclipse-temurin:17-jre
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
 
-#Note: local add Java Opt: -Dspring.profiles.active=[dev|test|prod]
-ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS}  -Djava.security.egd=file:/dev/./urandom -jar /usr/local/lib/app.jar"]
+# Makes use of environment variables for configuration
+ENTRYPOINT ["java", "-jar", "app.jar"]
