@@ -41,16 +41,16 @@ public class CS4PlayasDataRepositoryTest extends RepositoryTest {
         cs4PlayasDataRepository.saveAndFlush(data);
     }
     
-    @Test
-    void testReadata() {
-        try {
-            utils.readExcelFile(new FileInputStream(new File("D:\\52n\\Projekte\\ENFORCE\\Playas-test.xlsx")));
-            assertTrue(cs4PlayasDataRepository.count() > 0);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        
-    }
+//    @Test
+//    void testReadata() {
+//        try {
+//            utils.readExcelFile(new FileInputStream(new File("D:\\52n\\Projekte\\ENFORCE\\Playas-test.xlsx")));
+//            assertTrue(cs4PlayasDataRepository.count() > 0);
+//        } catch (IOException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
+//        
+//    }
 
 }

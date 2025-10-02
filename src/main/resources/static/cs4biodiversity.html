@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ENFORCE CS4 Marine litter data (MANORBA app)</title>
+<title>ENFORCE CS4 Biodiversity data (MINKA app)</title>
 
 <script src="https://unpkg.com/rxjs@^7/dist/bundles/rxjs.umd.min.js"></script>
 
@@ -26,7 +26,7 @@ html, body {
 }
 
 .leaflet-popup-content {
-	height: 100%;
+	height: 300px;
 	width: 300px !important;
 }
 
@@ -34,7 +34,6 @@ img.half {
 	height: 50%;
 	width: 50%;
 }
-
 .header {
 	background-image:
 		url("https://join-enforce.eu/wp-content/uploads/2025/03/header-bg.png");
@@ -46,7 +45,7 @@ img.half {
 
         const MAX_FEATURE_COUNT = 1000;
         const MAP_CRS = 'EPSG:4326';
-        const GEOSERVER_URL = '/cs4_playas_data';
+        const GEOSERVER_URL = '/data';
         
         class Map {
 
@@ -99,6 +98,14 @@ img.half {
 
                 if (!!this.featureLayer) {
                     this.map.removeLayer(this.featureLayer);
+                }      
+                
+                // specify popup options 
+                var customOptions =
+                    {
+                    'width': '500',
+                    'heigth': '500',
+                    'className' : 'custom'
                 }
                 
                 var today = Date.now();
@@ -113,32 +120,16 @@ img.half {
                 
                 this.featureLayer = L.geoJSON(features, {
                     pointToLayer: (feature, latlng) => L.circleMarker(latlng, {
-                        radius: 6,
+                        radius: 3,
                         color: determineColor(Date.parse(feature.properties.updated_datetime)),
                         fillColor: determineColor(Date.parse(feature.properties.updated_datetime)),
                         fillOpacity: 1,
                     }),
                     onEachFeature: (feature, layer) => {
-                        var observedProperties = feature.properties.observed_properties;
-                        var tableInner = "";
-                        observedProperties.forEach(function(observedProperty){
-                            if(observedProperty.observed_property_count != 0){
-                                tableInner = tableInner + "<tr>";
-                                tableInner = tableInner + "<td>" + observedProperty.name + "</td>";
-                                tableInner = tableInner + "<td>" + observedProperty.observed_property_count + "</td>";
-                                tableInner = tableInner + "</tr>";
-                            }
-                        });
-                        var customPopup = "<h1>Cleaning date: " + feature.properties.cleaning_date + "</h1>"
-                        +  "<h2> Totel items: " + feature.properties.total_items + "</h2>" + "</br>"
-                        +  "<h2>Found items</h2>"
-                        +  "<table>"
-                        +  "<tr>"
-                        +  "<th>Name</th>"
-                        +  "<th>Count</th>"
-                        +  "</tr>"
-                        + tableInner
-                        +  "</table>";
+                        var customPopup = "<h1>" + feature.properties.species_name + "</h1>" + "</br>" 
+                        + "<img class='half'' src='" + feature.properties.media_url + "' width='500px'/>" + "</br>" 
+                        +  "<h2>" + feature.properties.observed_datetime + "</h2>";
+					    //layer.bindPopup(feature.properties.species_name + "</br>" + "<img src=feature.properties.media_url/>");
 					    layer.bindPopup(customPopup);
                     },
                 }).addTo(this.map);
@@ -157,7 +148,7 @@ img.half {
 		<div class="header"
 			style="height: 102px; overflow: visible; top: 0px;"></div>
 	</header>
-	<h1>ENFORCE CS4 Marine litter data (MANORBA app)</h1>
+	<h1>ENFORCE CS4 Biodiversity data (MINKA app</h1>
 	<div id="map"></div>
 </body>
 </html>

@@ -1,141 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leaflet Map using WFS and GeoServer</title>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>52°North ENFORCE Development Server</title>
+<link rel="stylesheet"
+	href="https://sensorweb.demo.52north.org/css/piss.css">
+<style>
+html, body {
+	height: 100%;
+	margin: 0;
+}
 
-    <script src="https://unpkg.com/rxjs@^7/dist/bundles/rxjs.umd.min.js"></script>
-
-    <link href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" rel="stylesheet"/>
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-
-    <style>
-		html, body {
-			height: 100%;
-			margin: 0;
-		}
-		.leaflet-container {
-			height: 1000px;
-			width: 1000px;
-			max-width: 100%;
-			max-height: 100%;
-		}
-		.leaflet-popup-content {
-			height: 300px;
-			width: 300px !important;
-		}
-		img.half {
-            height: 50%;
-            width: 50%;
-        }
-    </style>
-
-    <script>
-
-        const MAX_FEATURE_COUNT = 1000;
-        const MAP_CRS = 'EPSG:4326';
-        const GEOSERVER_URL = '/data';
-        
-        class Map {
-
-            map;
-            featureLayer;
-
-            constructor() {
-                this.initMap();
-            }
-
-            initMap() {
-
-                this.map = L.map('map', {
-                    center: [41.3697481733, 2.1907388249],
-                    zoom: 11,
-                });
-
-                const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                }).addTo(this.map);
-
-                tiles.addTo(this.map);
-
-                this.fetchFeatures();
-
-                const subject = new rxjs.Subject();
-                subject.asObservable()
-                    .pipe(
-                        rxjs.sampleTime(250)
-                    )
-                    .subscribe(_ => this.fetchFeatures());
-
-                for (const eventName of ['resize', 'viewreset', 'zoomend', 'moveend']) {
-                    this.map.on(eventName, event => {
-                        subject.next(event);
-                    });
-                }
-
-            }
-
-            async fetchFeatures() {
-
-                const params = new URLSearchParams({
-                    limit: `${MAX_FEATURE_COUNT}`,  // note: maxFeatures with WFS 1.1 and earlier
-                    outputFormat: 'application/json',
-                });
-
-                const response = await fetch(`${GEOSERVER_URL}?${params}`);
-                const features = await response.json();
-
-                if (!!this.featureLayer) {
-                    this.map.removeLayer(this.featureLayer);
-                }      
-                
-                // specify popup options 
-                var customOptions =
-                    {
-                    'width': '500',
-                    'heigth': '500',
-                    'className' : 'custom'
-                }
-                
-                var today = Date.now();
-                
-                function determineColor(date) {
-                	  if ( date < today) {
-                	    return 'red';
-                	  } else if ( date >= today) {
-                	    return 'blue';
-                	  }
-                }
-                
-                this.featureLayer = L.geoJSON(features, {
-                    pointToLayer: (feature, latlng) => L.circleMarker(latlng, {
-                        radius: 3,
-                        color: determineColor(Date.parse(feature.properties.updated_datetime)),
-                        fillColor: determineColor(Date.parse(feature.properties.updated_datetime)),
-                        fillOpacity: 1,
-                    }),
-                    onEachFeature: (feature, layer) => {
-                        var customPopup = "<h1>" + feature.properties.species_name + "</h1>" + "</br>" 
-                        + "<img class='half'' src='" + feature.properties.media_url + "' width='500px'/>" + "</br>" 
-                        +  "<h2>" + feature.properties.observed_datetime + "</h2>";
-					    //layer.bindPopup(feature.properties.species_name + "</br>" + "<img src=feature.properties.media_url/>");
-					    layer.bindPopup(customPopup);
-                    },
-                }).addTo(this.map);
-
-            }
-
-        }
-
-        document.addEventListener("DOMContentLoaded", () => new Map());
-
-    </script>
+.header {
+	background-image:
+		url("https://join-enforce.eu/wp-content/uploads/2025/03/header-bg.png");
+	background-repeat: repeat-x;
+}
+</style>
 
 </head>
 <body>
-    <h1>ENFORCE CS4</h1>
-    <div id="map"></div>
+	<div id="content">
+		<header class="header-wrapper">
+			<div class="header"
+				style="height: 102px; overflow: visible; top: 0px;"></div>
+		</header>
+		<h1>ENFORCE Demo Applications</h1>
+		<div class="row">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+				<h2 class="text-center" style="color: #66c5e4;">Case Study 4</h2>
+			</div>
+		</div>
+		<div id="landing-page-buttons" class="container">
+			<div class="row">
+				<a class="col-lg-6 col-md-6 col-sm-6 col-xs-12"
+					href="./cs4playas.html">
+					<div class="landing-page-button">
+						<div class="caption">Marine litter data (MANORBA app)</div>
+					</div>
+				</a> <a class="col-lg-6 col-md-6 col-sm-6 col-xs-12"
+					href="./cs4biodiversity.html">
+					<div class="landing-page-button">
+						<div class="caption">Biodiversity data (MINKA app)</div>
+					</div>
+				</a>
+			</div>
+		</div>
+	</div>
 </body>
 </html>
