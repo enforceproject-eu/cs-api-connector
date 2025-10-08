@@ -12,6 +12,10 @@
 	rel="stylesheet" />
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 
+<link rel="stylesheet" href="https://leaflet.github.io/Leaflet.markercluster/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://leaflet.github.io/Leaflet.markercluster/dist/MarkerCluster.Default.css" />
+<script src="https://leaflet.github.io/Leaflet.markercluster/dist//leaflet.markercluster-src.js"></script>
+
 <style>
 html, body {
 	height: 100%;
@@ -96,6 +100,8 @@ img.half {
                 const response = await fetch(`${GEOSERVER_URL}?${params}`);
                 const features = await response.json();
 
+        		var markers = L.markerClusterGroup();
+                
                 if (!!this.featureLayer) {
                     this.map.removeLayer(this.featureLayer);
                 }      
@@ -126,13 +132,18 @@ img.half {
                         fillOpacity: 1,
                     }),
                     onEachFeature: (feature, layer) => {
+                        var title= "feature"
+            			var marker = L.marker(new L.LatLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]), { title: title });
                         var customPopup = "<h1>" + feature.properties.species_name + "</h1>" + "</br>" 
                         + "<img class='half'' src='" + feature.properties.media_url + "' width='500px'/>" + "</br>" 
                         +  "<h2>" + feature.properties.observed_datetime + "</h2>";
-					    //layer.bindPopup(feature.properties.species_name + "</br>" + "<img src=feature.properties.media_url/>");
 					    layer.bindPopup(customPopup);
+					    marker.bindPopup(customPopup);
+            			markers.addLayer(marker);
                     },
-                }).addTo(this.map);
+                })
+
+        		markers.addTo(this.map);
 
             }
 
