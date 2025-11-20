@@ -1,8 +1,8 @@
 FROM maven:3.9-eclipse-temurin-17 AS build
 
 WORKDIR /tmp
-RUN git clone https://github.com/enforceproject-eu/cs4-db-model
-WORKDIR /tmp/cs4-db-model
+RUN git clone https://github.com/enforceproject-eu/cs3-db-model
+WORKDIR /tmp/cs3-db-model
 RUN mvn clean install -DskipTests
 
 WORKDIR /app
