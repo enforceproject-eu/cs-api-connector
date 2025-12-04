@@ -16,9 +16,7 @@ import org.springframework.context.annotation.Bean;
  */
 @SpringBootApplication
 @EntityScan(basePackages = {
-      "org.n52.project.enforce.cs4.playas.db.model", "org.n52.project.enforce.cs4.playas.db.repository",
-      "org.n52.project.enforce.db.model", "org.n52.project.enforce.db.repository",
-      "org.n52.project.enforce.cs3.db.model", "org.n52.project.enforce.cs3.db.repository"})
+      "org.n52.project.enforce.*"})
 public class Application {
 
     /**

@@ -1,56 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" sizes="192x192" href="https://join-enforce.eu/storage/2025/03/favicon-192.png">
-<title>ENFORCE CS4 Biodiversity data (MINKA app)</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaflet Map using WFS and GeoServer</title>
 
-<script src="https://unpkg.com/rxjs@^7/dist/bundles/rxjs.umd.min.js"></script>
+    <script src="https://unpkg.com/rxjs@^7/dist/bundles/rxjs.umd.min.js"></script>
 
-<link href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-	rel="stylesheet" />
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" rel="stylesheet"/>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 
-<link rel="stylesheet" href="https://leaflet.github.io/Leaflet.markercluster/dist/MarkerCluster.css" />
-<link rel="stylesheet" href="https://leaflet.github.io/Leaflet.markercluster/dist/MarkerCluster.Default.css" />
-<script src="https://leaflet.github.io/Leaflet.markercluster/dist//leaflet.markercluster-src.js"></script>
+    <style>
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+		.leaflet-container {
+			height: 1000px;
+			width: 1000px;
+			max-width: 100%;
+			max-height: 100%;
+		}
+		.leaflet-popup-content {
+			height: 300px;
+			width: 300px !important;
+		}
+		img.half {
+            height: 50%;
+            width: 50%;
+        }
+    </style>
 
-<style>
-html, body {
-	height: 100%;
-	margin: 0;
-}
-
-.leaflet-container {
-	height: 1000px;
-	width: 1000px;
-	max-width: 100%;
-	max-height: 100%;
-}
-
-.leaflet-popup-content {
-	height: 300px;
-	width: 300px !important;
-}
-
-img.half {
-	height: 50%;
-	width: 50%;
-}
-.header {
-	background-image:
-		url("https://join-enforce.eu/wp-content/uploads/2025/03/header-bg.png");
-	background-repeat: repeat-x;
-}
-</style>
-
-<script>
+    <script>
 
         const MAX_FEATURE_COUNT = 1000;
         const MAP_CRS = 'EPSG:4326';
-        const GEOSERVER_URL = '/cs4_minka_data';
+        const GEOSERVER_URL = 'http://localhost/geoserver/wfs';
         
         class Map {
 
@@ -94,18 +80,26 @@ img.half {
             async fetchFeatures() {
 
                 const params = new URLSearchParams({
-                    limit: `${MAX_FEATURE_COUNT}`,  // note: maxFeatures with WFS 1.1 and earlier
+                    service: 'WFS',
+                    version: '2.0.0',
+                    request: 'GetFeature',
+                    typeName: '	enforce_cs4:data',
+                    srsName: MAP_CRS,
+                    count: `${MAX_FEATURE_COUNT}`,  // note: maxFeatures with WFS 1.1 and earlier
                     outputFormat: 'application/json',
+                    bbox: `${this.map.getBounds().toBBoxString()},${MAP_CRS}`,
                 });
 
                 const response = await fetch(`${GEOSERVER_URL}?${params}`);
                 const features = await response.json();
 
-        		var markers = L.markerClusterGroup();
-                
                 if (!!this.featureLayer) {
                     this.map.removeLayer(this.featureLayer);
-                }      
+                }
+				
+	            // create popup contents
+                //var customPopup = "Mozilla Toronto Offices<br/><img src='http://joshuafrazier.info/images/maptime.gif' alt='maptime logo gif' width='350px'/>";
+                
                 
                 // specify popup options 
                 var customOptions =
@@ -115,7 +109,7 @@ img.half {
                     'className' : 'custom'
                 }
                 
-                var today = Date.now();
+                var today = Date.parse("2025-08-26");
                 
                 function determineColor(date) {
                 	  if ( date < today) {
@@ -133,18 +127,13 @@ img.half {
                         fillOpacity: 1,
                     }),
                     onEachFeature: (feature, layer) => {
-                        var title= "feature"
-            			var marker = L.marker(new L.LatLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]), { title: title });
                         var customPopup = "<h1>" + feature.properties.species_name + "</h1>" + "</br>" 
                         + "<img class='half'' src='" + feature.properties.media_url + "' width='500px'/>" + "</br>" 
                         +  "<h2>" + feature.properties.observed_datetime + "</h2>";
+					    //layer.bindPopup(feature.properties.species_name + "</br>" + "<img src=feature.properties.media_url/>");
 					    layer.bindPopup(customPopup);
-					    marker.bindPopup(customPopup);
-            			markers.addLayer(marker);
                     },
-                })
-
-        		markers.addTo(this.map);
+                }).addTo(this.map);
 
             }
 
@@ -156,11 +145,7 @@ img.half {
 
 </head>
 <body>
-	<header class="header-wrapper">
-		<div class="header"
-			style="height: 102px; overflow: visible; top: 0px;"></div>
-	</header>
-	<h1>ENFORCE CS4 Biodiversity data (MINKA app</h1>
-	<div id="map"></div>
+    <h1>ENFORCE CS4</h1>
+    <div id="map"></div>
 </body>
 </html>

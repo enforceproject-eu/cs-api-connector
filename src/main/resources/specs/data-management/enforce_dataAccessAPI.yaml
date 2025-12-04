@@ -1,0 +1,242 @@
+openapi: 3.0.3
+info:
+  title: ENFORCE Data Access API
+  description: "ENFORCE Data Access API"
+  contact:
+    email: b.pross@52north.org
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 0.0.1
+servers:
+  - url: https://enforce.dev.52north.org/
+tags:
+  - name: access-control
+    description: the AccessControl API
+  - name: database-public
+    description: the public Database API
+paths:
+  /cs4_minka_data:
+    get:
+      tags:
+        - minka
+      summary: get data gathered by the MINKA app 
+      description:  get data gathered by the MINKA app 
+      operationId: getCs4MinkaData
+      parameters:
+        - name: limit
+          in: query
+          description: maximum number of requested features
+          required: false
+          schema:
+            type: number
+      responses:
+        "200":
+          description: OK
+          content:
+            application/vnd.geo+json:
+              schema:
+                 $ref: '#/components/schemas/FeatureCollection'
+        "400":
+          description: Invalid status value
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Error'    
+        "401":
+          description: API key is missing or invalid
+          content: {}
+        "403":
+          description: Forbidden
+          content: {}
+        "404":
+          description: Not Found
+          content: {}
+  /cs4_manorba_data:
+    get:
+      tags:
+        - manorba
+      summary: get data gathered by the MANORBA app 
+      description:  get data gathered by the MANORBA app 
+      operationId: getCs4ManorbaData
+      parameters:
+        - name: limit
+          in: query
+          description: maximum number of requested features
+          required: false
+          schema:
+            type: number
+      responses:
+        "200":
+          description: OK
+          content:
+            application/vnd.geo+json:
+              schema:
+                  $ref: '#/components/schemas/FeatureCollection'
+        "400":
+          description: Invalid status value
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Error'
+        "401":
+          description: API key is missing or invalid
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Error'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Error'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - manorba
+      summary: Add a new geo-resource
+      description: Add/Register a geo-resource dataset for a certain period of time
+      operationId: addCs4ManorbaDataAsBody
+      requestBody:
+        description: feature data
+        content:
+          application/enforce-cs4-playas-data:
+              schema:
+                 type: string
+        required: true
+      responses:
+        "201":
+          description: Created
+        "401":
+          description: API key is missing or invalid
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Error'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Error'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Error'
+        "405":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Error'
+components:
+    schemas:
+       FeatureCollection:
+         title: FeatureCollection
+         type: object
+         required:
+           - type
+           - features
+         properties:
+           type:
+             type: string
+             enum:
+               - FeatureCollection
+           features:
+             type: array
+             items:
+               $ref: '#/components/schemas/FeatureGeoJSON'
+       FeatureGeoJSON:
+            type: object
+            required:
+              - type
+              - geometry
+              - properties
+            properties:
+              type:
+                type: string
+                enum:
+                  - Feature
+              geometry:
+                $ref: '#/components/schemas/GeometryGeoJSON'
+              properties:
+                type: object
+                nullable: true
+              id:
+                oneOf:
+                  - type: string
+                  - type: integer
+       GeometryGeoJSON:
+         oneOf:
+         - $ref: '#/components/schemas/PointGeoJSON'
+         - $ref: '#/components/schemas/MultipointGeoJSON'
+         - $ref: '#/components/schemas/MultipolygonGeoJSON'
+       PointGeoJSON:
+         type: object
+         required:
+           - type
+           - coordinates
+         properties:
+           type:
+             type: string
+             enum:
+               - Point
+           coordinates:
+             type: array
+             minItems: 2
+             items:
+               type: number
+       MultipointGeoJSON:
+         type: object
+         required:
+           - type
+           - coordinates
+         properties:
+           type:
+             type: string
+             enum:
+               - MultiPoint
+           coordinates:
+             type: array
+             items:
+               type: array
+               minItems: 2
+               items:
+                 type: number       
+       MultipolygonGeoJSON:
+          type: object
+          required:
+            - type
+            - coordinates
+          properties:
+            type:
+              type: string
+              enum:
+                - MultiPolygon
+            coordinates:
+              type: array
+              items:
+                type: array
+                items:
+                  type: array
+                  minItems: 4
+                  items:
+                    type: array
+                    minItems: 2
+                    items:
+                      type: number
+       Error:
+         type: object
+         required:
+           - message
+         properties:
+           message:
+             type: string

@@ -1,5 +1,6 @@
 package org.n52.project.enforce.util;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -120,6 +121,10 @@ public class Utils {
         }
     }
 
+    public void readExcelFile(String excelFileAsString) throws IOException {
+        readExcelFile(new ByteArrayInputStream(excelFileAsString.getBytes()));
+    }
+    
     public void readExcelFile(InputStream inputstream) throws IOException {
         File tmpExcelFile = File.createTempFile("excel", ".xlsx");
         IOUtils.copy(inputstream, new FileOutputStream(tmpExcelFile));
