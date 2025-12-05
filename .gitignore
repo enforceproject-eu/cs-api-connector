@@ -27,3 +27,4 @@ replay_pid*
 .env
 .settings/
 .project
+.openapi-generator/
