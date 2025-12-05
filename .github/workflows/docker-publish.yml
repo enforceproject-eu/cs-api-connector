@@ -31,7 +31,7 @@ jobs:
       - name: Build cs3 db model with Maven
         run: cd ./cs3-db-model && mvn clean install -DskipTests
       - name: Checkout cs1 module
-        run: cd .. && git clone https://github.com/enforceproject-eu/cs1-module
+        run: git clone https://github.com/enforceproject-eu/cs1-module
       - name: Build cs1 module with Maven
         run: cd ./cs1-module && mvn clean install -DskipTests
       - name: Build with Maven
