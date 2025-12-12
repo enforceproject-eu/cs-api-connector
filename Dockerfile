@@ -1,6 +1,11 @@
 FROM maven:3.9-eclipse-temurin-17 AS build
 
 WORKDIR /tmp
+RUN git clone https://github.com/enforceproject-eu/cs-module-parent
+WORKDIR /tmp/cs-module-parent
+RUN mvn clean install -DskipTests
+
+WORKDIR /tmp
 RUN git clone https://github.com/enforceproject-eu/cs3-db-model
 WORKDIR /tmp/cs3-db-model
 RUN mvn clean install -DskipTests
@@ -8,6 +13,11 @@ RUN mvn clean install -DskipTests
 WORKDIR /tmp
 RUN git clone https://github.com/enforceproject-eu/cs1-module
 WORKDIR /tmp/cs1-module
+RUN mvn clean install -DskipTests
+
+WORKDIR /tmp
+RUN git clone https://github.com/enforceproject-eu/cs5-module
+WORKDIR /tmp/cs5-module
 RUN mvn clean install -DskipTests
 
 WORKDIR /app
