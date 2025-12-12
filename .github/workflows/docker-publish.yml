@@ -26,6 +26,10 @@ jobs:
          java-version: '17'
          distribution: 'temurin'
          cache: maven 
+      - name: Checkout cs module parent
+        run: git clone https://github.com/enforceproject-eu/cs-module-parent
+      - name: Build cs module parent with Maven
+        run: cd ./cs-module-parent && mvn clean install -DskipTests      
       - name: Checkout cs3 db model
         run: git clone https://github.com/enforceproject-eu/cs3-db-model
       - name: Build cs3 db model with Maven
@@ -34,6 +38,10 @@ jobs:
         run: git clone https://github.com/enforceproject-eu/cs1-module
       - name: Build cs1 module with Maven
         run: cd ./cs1-module && mvn clean install -DskipTests
+      - name: Checkout cs5 module
+        run: git clone https://github.com/enforceproject-eu/cs5-module
+      - name: Build cs5 module with Maven
+        run: cd ./cs5-module && mvn clean install -DskipTests
       - name: Build with Maven
         run: mvn -B package --file pom.xml 
       - name: Extract metadata (tags, labels) for tagging Docker Image
