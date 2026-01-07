@@ -1,12 +1,19 @@
 package org.n52.project.enforce.fetching;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.MessageDigest;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
@@ -45,6 +52,8 @@ public class MinkaApiFetcher {
 	private Utils utils;
 
 	private boolean initialize = false;
+	
+	private String dataDir;
 
 	private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("YYYY-MM-dd");
 
@@ -57,6 +66,7 @@ public class MinkaApiFetcher {
 		this.utils = utils;
 		urlSpec = environment.getProperty("minka.url.spec");
 		initialize = Boolean.parseBoolean(environment.getProperty("minka.db.initialize"));
+		dataDir = environment.getProperty("data.dir");
 		try {
 			updateUrl = new URI(String.format(environment.getProperty("minka.update.url.spec"),
 					dateTimeFormatter.format(OffsetDateTime.now()))).toURL();
@@ -66,7 +76,7 @@ public class MinkaApiFetcher {
 
 		try {
 			outputDataUrl = findEndpoint();
-		} catch (IOException e) {
+		} catch (IOException | URISyntaxException e) {
 			LOG.error(e.getMessage());
 			throw new RuntimeException(e);
 		}
@@ -122,7 +132,25 @@ public class MinkaApiFetcher {
 	}
 
 	private void checkForUpdates() throws Exception {
-		JsonNode node = mapper.readTree(updateUrl);
+	          UUID uuid = UUID.randomUUID();
+	        File dataDirectory = new File(dataDir + "/" + System.currentTimeMillis());
+	          dataDirectory.mkdir();
+	        File file = new File(dataDirectory.getAbsolutePath() + "/" + uuid);
+	          try (BufferedInputStream in = new BufferedInputStream(updateUrl.openStream());
+	                  FileOutputStream fileOutputStream = new FileOutputStream(file)) {
+	                    byte dataBuffer[] = new byte[1024];
+	                    int bytesRead;
+	                    while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+	                        fileOutputStream.write(dataBuffer, 0, bytesRead);
+	                    }
+	                } catch (IOException e) {
+	                    // handle exception
+	                }
+	          byte[] data = Files.readAllBytes(Paths.get(file.getAbsolutePath()));
+	          byte[] hash = MessageDigest.getInstance("MD5").digest(data);
+	          String checksum = new BigInteger(1, hash).toString(16);
+	          LOG.debug(checksum);
+		JsonNode node = mapper.readTree(file);
 		LOG.info("Fetched output.");
 		if (node instanceof ObjectNode) {
 			ObjectNode objectNode = (ObjectNode) node;
@@ -132,6 +160,7 @@ public class MinkaApiFetcher {
 				for (JsonNode jsonNode : resultsArray) {
 					UUID id = utils.getId(jsonNode);
 					if (utils.ckeckIdIsInDb(id)) {
+	                                        mapper.writer().writeValue(new File(dataDirectory.getAbsolutePath() + "/" + id), jsonNode);
 						utils.updateData(jsonNode);
 					}
 				}
@@ -145,7 +174,25 @@ public class MinkaApiFetcher {
 	}
 	
 	private void fetchAndStoreData(URL url) throws Exception {
-		JsonNode node = mapper.readTree(url);
+	  UUID uuid = UUID.randomUUID();
+	  File dataDirectory = new File(dataDir + "/" + System.currentTimeMillis());
+	  dataDirectory.mkdir();
+	  File file = new File(dataDirectory.getAbsolutePath() + "/" + uuid);
+          try (BufferedInputStream in = new BufferedInputStream(url.openStream());
+          FileOutputStream fileOutputStream = new FileOutputStream(file)) {
+            byte dataBuffer[] = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+                fileOutputStream.write(dataBuffer, 0, bytesRead);
+            }
+        } catch (IOException e) {
+            // handle exception
+        }
+          byte[] data = Files.readAllBytes(Paths.get(file.getAbsolutePath()));
+          byte[] hash = MessageDigest.getInstance("MD5").digest(data);
+          String checksum = new BigInteger(1, hash).toString(16);
+          LOG.debug(checksum);
+		JsonNode node = mapper.readTree(file);
 		LOG.info("Fetched output.");
 		if (node instanceof ObjectNode) {
 			ObjectNode objectNode = (ObjectNode) node;
@@ -158,6 +205,7 @@ public class MinkaApiFetcher {
 						LOG.info(String.format("Data with id %s already exists in database.", id.toString()));
 						continue;
 					}
+					mapper.writer().writeValue(new File(dataDirectory.getAbsolutePath() + "/" + id), jsonNode);
 					utils.createNewData(jsonNode);
 					LOG.info("New Data was created.");
 				}
@@ -170,9 +218,9 @@ public class MinkaApiFetcher {
 		return mapper.readValue(url, type);
 	}
 
-	URL findEndpoint() throws MalformedURLException, IOException {
+	URL findEndpoint() throws MalformedURLException, IOException, URISyntaxException {
 		URLConnection urlConnection = null;
-		URL outputDataUrl = new URL(urlSpec);
+		URL outputDataUrl = new URI(urlSpec).toURL();
 		LOG.info("Checking endpoint: " + urlSpec);
 		urlConnection = outputDataUrl.openConnection();
 		urlConnection.setReadTimeout(3000);
