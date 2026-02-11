@@ -6,13 +6,18 @@ WORKDIR /tmp/cs-module-parent
 RUN mvn clean install -DskipTests
 
 WORKDIR /tmp
+RUN git clone https://github.com/enforceproject-eu/cs1-module
+WORKDIR /tmp/cs1-module
+RUN mvn clean install -DskipTests
+
+WORKDIR /tmp
 RUN git clone https://github.com/enforceproject-eu/cs3-db-model
 WORKDIR /tmp/cs3-db-model
 RUN mvn clean install -DskipTests
 
 WORKDIR /tmp
-RUN git clone https://github.com/enforceproject-eu/cs1-module
-WORKDIR /tmp/cs1-module
+RUN git clone https://github.com/enforceproject-eu/cs4-db-model
+WORKDIR /tmp/cs4-db-model
 RUN mvn clean install -DskipTests
 
 WORKDIR /tmp

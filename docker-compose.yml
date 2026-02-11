@@ -16,6 +16,13 @@ services:
       MINKA_UPDATE_URL_SPEC: ${MINKA_UPDATE_URL_SPEC}
       MINKA_DB_INITIALIZE: ${MINKA_DB_INITIALIZE}
       MINKA_INITIALIZE_URL_SPEC: ${MINKA_INITIALIZE_URL_SPEC}
+      DATA_DIR: ${DATA_DIR}
+      ENFORCE_USER: ${ENFORCE_USER}
+      ENFORCE_PASSWORD: ${ENFORCE_PASSWORD}
+    ports:
+      - "8080:8080"
+    volumes:
+       - cs-data-storage:${DATA_DIR}
     networks:
       cs-api-connector:
         ipv4_address: 172.30.0.2
@@ -35,21 +42,6 @@ services:
       cs-api-connector:
         ipv4_address: 172.30.0.3
       
-  geoserver:
-    image: kartoza/geoserver
-    container_name: geoserver
-    volumes:
-      - ./data:/opt/geoserver/data_dir
-    ports:
-      - "8080:8080"
-    environment:
-      - GEOSERVER_ADMIN_USER=${GEOSERVER_ADMIN_USER}
-      - GEOSERVER_ADMIN_PASSWORD=${GEOSERVER_ADMIN_PASSWORD}
-    restart: unless-stopped
-    networks:
-      cs-api-connector:
-        ipv4_address: 172.30.0.4
-      
   reverse:
     image: nginx
     ports:
@@ -57,7 +49,6 @@ services:
       - 443:443
     volumes:
       - ./src/docker/nginx/conf.d:/etc/nginx/conf.d
-      - ./src/docker/nginx/index.html:/usr/share/nginx/html/index.html
     networks:
       cs-api-connector:
         ipv4_address: 172.30.0.5
@@ -71,3 +62,6 @@ volumes:
     cs-api-connector-postgres-storage:
       external: true
       name: cs-api-connector-postgres-storage
+    cs-data-storage:
+      external: true
+      name: cs-data-storage
