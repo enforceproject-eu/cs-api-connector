@@ -30,14 +30,18 @@ jobs:
         run: git clone https://github.com/enforceproject-eu/cs-module-parent
       - name: Build cs module parent with Maven
         run: cd ./cs-module-parent && mvn clean install -DskipTests      
-      - name: Checkout cs3 db model
-        run: git clone https://github.com/enforceproject-eu/cs3-db-model
-      - name: Build cs3 db model with Maven
-        run: cd ./cs3-db-model && mvn clean install -DskipTests
       - name: Checkout cs1 module
         run: git clone https://github.com/enforceproject-eu/cs1-module
       - name: Build cs1 module with Maven
         run: cd ./cs1-module && mvn clean install -DskipTests
+      - name: Checkout cs3 db model
+        run: git clone https://github.com/enforceproject-eu/cs3-db-model
+      - name: Build cs3 db model with Maven
+        run: cd ./cs3-db-model && mvn clean install -DskipTests
+      - name: Checkout cs4 module
+        run: git clone https://github.com/enforceproject-eu/cs4-db-model
+      - name: Build cs4 module with Maven
+        run: cd ./cs4-db-model && mvn clean install -DskipTests
       - name: Checkout cs5 module
         run: git clone https://github.com/enforceproject-eu/cs5-module
       - name: Build cs5 module with Maven
