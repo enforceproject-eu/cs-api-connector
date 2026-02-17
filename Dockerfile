@@ -25,6 +25,11 @@ RUN git clone https://github.com/enforceproject-eu/cs5-module
 WORKDIR /tmp/cs5-module
 RUN mvn clean install -DskipTests
 
+WORKDIR /tmp
+RUN git clone https://github.com/enforceproject-eu/cs8-module
+WORKDIR /tmp/cs8-module
+RUN mvn clean install -DskipTests
+
 WORKDIR /app
 COPY pom.xml .
 COPY src ./src
