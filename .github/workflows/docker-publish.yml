@@ -46,6 +46,10 @@ jobs:
         run: git clone https://github.com/enforceproject-eu/cs5-module
       - name: Build cs5 module with Maven
         run: cd ./cs5-module && mvn clean install -DskipTests
+      - name: Checkout cs7 module
+        run: git clone https://github.com/enforceproject-eu/cs7-module
+      - name: Build cs7 module with Maven
+        run: cd ./cs7-module && mvn clean install -DskipTests
       - name: Checkout cs8 module
         run: git clone https://github.com/enforceproject-eu/cs8-module
       - name: Build cs8 module with Maven

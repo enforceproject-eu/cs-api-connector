@@ -26,6 +26,11 @@ WORKDIR /tmp/cs5-module
 RUN mvn clean install -DskipTests
 
 WORKDIR /tmp
+RUN git clone https://github.com/enforceproject-eu/cs7-module
+WORKDIR /tmp/cs7-module
+RUN mvn clean install -DskipTests
+
+WORKDIR /tmp
 RUN git clone https://github.com/enforceproject-eu/cs8-module
 WORKDIR /tmp/cs8-module
 RUN mvn clean install -DskipTests
