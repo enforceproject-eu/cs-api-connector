@@ -11,6 +11,11 @@ WORKDIR /tmp/cs1-module
 RUN mvn clean install -DskipTests
 
 WORKDIR /tmp
+RUN git clone https://github.com/enforceproject-eu/cs2-module
+WORKDIR /tmp/cs2-module
+RUN mvn clean install -DskipTests
+
+WORKDIR /tmp
 RUN git clone https://github.com/enforceproject-eu/cs3-db-model
 WORKDIR /tmp/cs3-db-model
 RUN mvn clean install -DskipTests

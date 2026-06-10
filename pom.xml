@@ -176,6 +176,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.n52.project.enforce</groupId>
+			<artifactId>cs2-module</artifactId>
+	        <version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.n52.project.enforce</groupId>
 			<artifactId>cs5-module</artifactId>
 	        <version>0.0.1-SNAPSHOT</version>
 		</dependency>
