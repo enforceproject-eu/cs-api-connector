@@ -1,10 +1,12 @@
 package org.n52.project.enforce;
 
-import org.n52.jackson.datatype.jts.JtsModule;
+//import org.n52.jackson.datatype.jts.JtsModule;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.persistence.autoconfigure.EntityScan;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 /**
  * <p>
@@ -15,8 +17,9 @@ import org.springframework.context.annotation.Bean;
  * @since 1.0.0
  */
 @SpringBootApplication
-@EntityScan(basePackages = {
-      "org.n52.project.enforce.*"})
+@EntityScan(basePackages = {"org.n52.project.enforce.**"})
+@EnableJpaRepositories(basePackages = {"org.n52.project.enforce.**"})
+@ComponentScan(basePackages = {"org.n52.project.enforce.**"})
 public class Application {
 
     /**
@@ -31,16 +34,16 @@ public class Application {
         new SpringApplicationBuilder(Application.class).run(args);
     }
 
-    /**
-     * <p>
-     * jtsModule.
-     * </p>
-     *
-     * @return a {@link org.n52.jackson.datatype.jts.JtsModule} object
-     */
-    @Bean
-    public JtsModule jtsModule() {
-        return new JtsModule();
-    }
+//    /**
+//     * <p>
+//     * jtsModule.
+//     * </p>
+//     *
+//     * @return a {@link org.n52.jackson.datatype.jts.JtsModule} object
+//     */
+//    @Bean
+//    public JtsModule jtsModule() {
+//        return new JtsModule();
+//    }
 
 }
