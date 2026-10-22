@@ -16,6 +16,11 @@ WORKDIR /tmp/cs2-module
 RUN mvn clean install -DskipTests
 
 WORKDIR /tmp
+RUN git clone https://github.com/enforceproject-eu/geoquest-module
+WORKDIR /tmp/geoquest-module
+RUN mvn clean install -Pgenerate-remote-api -DskipTests 
+
+WORKDIR /tmp
 RUN git clone https://github.com/enforceproject-eu/cs3-db-model
 WORKDIR /tmp/cs3-db-model
 RUN mvn clean install -DskipTests

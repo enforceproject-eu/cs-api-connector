@@ -33,7 +33,7 @@ jobs:
       - name: Checkout geoquest module
         run: git clone https://github.com/enforceproject-eu/geoquest-module
       - name: Build geoquest module with Maven
-        run: cd ./geoquest-module && mvn clean install -Pgenerate-remote-api -DskipTests       
+        run: cd ./geoquest-module && mvn clean install -Pgenerate-remote-api -DskipTests  
       - name: Checkout cs3 db model
         run: git clone https://github.com/enforceproject-eu/cs3-db-model
       - name: Build cs3 db model with Maven
