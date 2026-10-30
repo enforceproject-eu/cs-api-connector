@@ -1,0 +1,17 @@
+springdoc:
+  version: '@springdoc.version@'
+  swagger-ui:
+    display-request-duration: true
+    groups-order: DESC
+    operationsSorter: method
+    disable-swagger-default-url: true
+    use-root-path: false
+  show-actuator: true
+  group-configs:
+    - group: all
+      paths-to-match: /**
+  cache:
+    disabled: true
+server:
+  port: 8080
+  forward-headers-strategy: framework

@@ -175,16 +175,17 @@
 			<artifactId>geoquest-module</artifactId>
 	        <version>0.0.1-SNAPSHOT</version>
 		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>org.n52.project.enforce</groupId>-->
-<!--			<artifactId>cs3-db-model</artifactId>-->
-<!--	        <version>0.0.1-SNAPSHOT</version>-->
-<!--		</dependency>-->
+		<dependency>
+			<groupId>org.n52.project.enforce</groupId>
+			<artifactId>cs3-db-model</artifactId>
+	        <version>0.0.1-SNAPSHOT</version>
+		</dependency>
 		<dependency>
 			<groupId>org.n52.project.enforce</groupId>
 			<artifactId>cs4-db-model</artifactId>
 	        <version>0.0.1-SNAPSHOT</version>
 		</dependency>
+
 <!--		<dependency>-->
 <!--			<groupId>org.n52.project.enforce</groupId>-->
 <!--			<artifactId>cs1-module</artifactId>-->
@@ -195,21 +196,22 @@
 <!--			<artifactId>cs2-module</artifactId>-->
 <!--	        <version>0.0.1-SNAPSHOT</version>-->
 <!--		</dependency>-->
-<!--		<dependency>-->
-<!--			<groupId>org.n52.project.enforce</groupId>-->
-<!--			<artifactId>cs5-module</artifactId>-->
-<!--	        <version>0.0.1-SNAPSHOT</version>-->
-<!--		</dependency>-->
+
+		<dependency>
+			<groupId>org.n52.project.enforce</groupId>
+			<artifactId>cs5-module</artifactId>
+	        <version>0.0.1-SNAPSHOT</version>
+		</dependency>
 		<dependency>
 			<groupId>org.n52.project.enforce</groupId>
 			<artifactId>cs8-module</artifactId>
 	        <version>0.0.1-SNAPSHOT</version>
 		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>org.n52.project.enforce</groupId>-->
-<!--			<artifactId>cs7-module</artifactId>-->
-<!--	        <version>0.0.1-SNAPSHOT</version>-->
-<!--		</dependency>-->
+		<dependency>
+			<groupId>org.n52.project.enforce</groupId>
+			<artifactId>cs7-module</artifactId>
+	        <version>0.0.1-SNAPSHOT</version>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.tomcat.embed</groupId>
 			<artifactId>tomcat-embed-core</artifactId>
@@ -244,10 +246,10 @@
 		   <groupId>org.springframework.boot</groupId>
 		   <artifactId>spring-boot-starter-security</artifactId>
 	    </dependency>
-<!--		<dependency>-->
-<!--			<groupId>org.springframework.boot</groupId>-->
-<!--			<artifactId>spring-boot-starter-thymeleaf</artifactId>-->
-<!--		</dependency>-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
