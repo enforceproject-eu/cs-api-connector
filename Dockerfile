@@ -54,5 +54,7 @@ FROM eclipse-temurin:17-jre
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
+RUN mkdir /usr/local/share/enforce-data
+
 # Makes use of environment variables for configuration
 ENTRYPOINT ["java", "-jar", "app.jar"]
