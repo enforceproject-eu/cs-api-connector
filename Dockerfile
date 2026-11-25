@@ -10,7 +10,7 @@ WORKDIR /tmp
 RUN git clone https://github.com/enforceproject-eu/common-data-model
 WORKDIR /tmp/common-data-model
 RUN git checkout v1.0.0
-RUN mvn clean install -Pgenerate-remote-api -DskipTests 
+RUN mvn clean install -DskipTests 
 
 WORKDIR /tmp
 RUN git clone https://github.com/enforceproject-eu/geoquest-module
