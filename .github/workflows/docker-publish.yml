@@ -29,31 +29,31 @@ jobs:
       - name: Checkout cs module parent
         run: git clone https://github.com/enforceproject-eu/cs-module-parent
       - name: Build cs module parent with Maven
-        run: cd ./cs-module-parent && mvn clean install -DskipTests      
+        run: cd ./cs-module-parent && git checkout v1.0.0 && mvn clean install -DskipTests      
       - name: Checkout geoquest module
         run: git clone https://github.com/enforceproject-eu/geoquest-module
       - name: Build geoquest module with Maven
-        run: cd ./geoquest-module && mvn clean install -Pgenerate-remote-api -DskipTests  
+        run: cd ./geoquest-module && git checkout v1.0.0 && mvn clean install -Pgenerate-remote-api -DskipTests  
       - name: Checkout cs3 db model
         run: git clone https://github.com/enforceproject-eu/cs3-db-model
       - name: Build cs3 db model with Maven
-        run: cd ./cs3-db-model && mvn clean install -DskipTests
+        run: cd ./cs3-db-model && git checkout v1.0.0 && mvn clean install -DskipTests
       - name: Checkout cs4 module
         run: git clone https://github.com/enforceproject-eu/cs4-db-model
       - name: Build cs4 module with Maven
-        run: cd ./cs4-db-model && mvn clean install -DskipTests
+        run: cd ./cs4-db-model && git checkout v1.0.0 && mvn clean install -DskipTests
       - name: Checkout cs5 module
         run: git clone https://github.com/enforceproject-eu/cs5-module
       - name: Build cs5 module with Maven
-        run: cd ./cs5-module && mvn clean install -DskipTests
+        run: cd ./cs5-module && git checkout v1.0.0 && mvn clean install -DskipTests
       - name: Checkout cs7 module
         run: git clone https://github.com/enforceproject-eu/cs7-module
       - name: Build cs7 module with Maven
-        run: cd ./cs7-module && mvn clean install -DskipTests
+        run: cd ./cs7-module && git checkout v1.0.0 && mvn clean install -DskipTests
       - name: Checkout cs8 module
         run: git clone https://github.com/enforceproject-eu/cs8-module
       - name: Build cs8 module with Maven
-        run: cd ./cs8-module && mvn clean install -DskipTests
+        run: cd ./cs8-module && git checkout v1.0.0 && mvn clean install -DskipTests
       - name: Build with Maven
         run: mvn -B package --file pom.xml 
       - name: Extract metadata (tags, labels) for tagging Docker Image

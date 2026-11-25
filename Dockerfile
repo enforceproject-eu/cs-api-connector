@@ -3,21 +3,13 @@ FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /tmp
 RUN git clone https://github.com/enforceproject-eu/cs-module-parent
 WORKDIR /tmp/cs-module-parent
-RUN mvn clean install -DskipTests
-
-WORKDIR /tmp
-RUN git clone https://github.com/enforceproject-eu/cs1-module
-WORKDIR /tmp/cs1-module
-RUN mvn clean install -DskipTests
-
-WORKDIR /tmp
-RUN git clone https://github.com/enforceproject-eu/cs2-module
-WORKDIR /tmp/cs2-module
+RUN git checkout v1.0.0
 RUN mvn clean install -DskipTests
 
 WORKDIR /tmp
 RUN git clone https://github.com/enforceproject-eu/geoquest-module
 WORKDIR /tmp/geoquest-module
+RUN git checkout v1.0.0
 RUN mvn clean install -Pgenerate-remote-api -DskipTests 
 
 WORKDIR /tmp
@@ -28,21 +20,19 @@ RUN mvn clean install -DskipTests
 WORKDIR /tmp
 RUN git clone https://github.com/enforceproject-eu/cs4-db-model
 WORKDIR /tmp/cs4-db-model
+RUN git checkout v1.0.0
 RUN mvn clean install -DskipTests
 
 WORKDIR /tmp
 RUN git clone https://github.com/enforceproject-eu/cs5-module
 WORKDIR /tmp/cs5-module
-RUN mvn clean install -DskipTests
-
-WORKDIR /tmp
-RUN git clone https://github.com/enforceproject-eu/cs7-module
-WORKDIR /tmp/cs7-module
+RUN git checkout v1.0.0
 RUN mvn clean install -DskipTests
 
 WORKDIR /tmp
 RUN git clone https://github.com/enforceproject-eu/cs8-module
 WORKDIR /tmp/cs8-module
+RUN git checkout v1.0.0
 RUN mvn clean install -DskipTests
 
 WORKDIR /app
