@@ -4,9 +4,11 @@ package org.n52.project.enforce;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.persistence.autoconfigure.EntityScan;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
 
 /**
  * <p>
@@ -20,6 +22,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EntityScan(basePackages = {"org.n52.project.enforce.**"})
 @EnableJpaRepositories(basePackages = {"org.n52.project.enforce.**"})
 @ComponentScan(basePackages = {"org.n52.project.enforce.**"})
+@OpenAPIDefinition(info = @Info(title = "ENFORCE Data API", version = "1.0.0", description = "Exposes data from all eight case studies."))
 public class Application {
 
     /**
