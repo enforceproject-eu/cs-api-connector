@@ -29,7 +29,11 @@ jobs:
       - name: Checkout cs module parent
         run: git clone https://github.com/enforceproject-eu/cs-module-parent
       - name: Build cs module parent with Maven
-        run: cd ./cs-module-parent && git checkout v1.0.0 && mvn clean install -DskipTests      
+        run: cd ./cs-module-parent && git checkout v1.0.0 && mvn clean install -DskipTests        
+      - name: Checkout common data model
+        run: git clone https://github.com/enforceproject-eu/common-data-model
+      - name: Build cs module parent with Maven
+        run: cd ./common-data-model && git checkout v1.0.0 && mvn clean install -DskipTests    
       - name: Checkout geoquest module
         run: git clone https://github.com/enforceproject-eu/geoquest-module
       - name: Build geoquest module with Maven
